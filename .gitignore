@@ -1,0 +1,11 @@
+node_modules/
+tmp/
+gen/
+
+*.zip
+
+playwright-report/
+test-results/
+
+.DS_Store
+Thumbs.db

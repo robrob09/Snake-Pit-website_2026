@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Раздел будущих разработок клана «Змеиное логово»." />
+    <meta name="theme-color" content="#08131f" />
+    <title>Наши разработки | Змеиное логово</title>
+    <link
+      rel="icon"
+      href="assets/icon-dark.svg"
+      type="image/svg+xml"
+      data-theme-favicon
+      data-theme-src-light="assets/icon.svg"
+      data-theme-src-dark="assets/icon-dark.svg"
+    />
+    <script src="js/theme-init.js"></script>
+    <link rel="stylesheet" href="css/styles.css" />
+    <script src="js/main.js" defer></script>
+  </head>
+  <body class="inner-page">
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-logo" href="index.html#top" aria-label="На главную страницу">
+          <img
+            src="assets/icon-dark.svg"
+            data-theme-src-light="assets/icon.svg"
+            data-theme-src-dark="assets/icon-dark.svg"
+            alt=""
+          />
+        </a>
+
+        <nav class="site-nav" aria-label="Основная навигация">
+          <div class="nav-inner">
+            <div class="nav-links" aria-label="Разделы главной страницы">
+              <a class="nav-link" href="index.html#top" data-section-link="top">Главная</a>
+              <a class="nav-link" href="index.html#team" data-section-link="team">О нас</a>
+              <a class="nav-link" href="index.html#rules" data-section-link="rules">Устав</a>
+              <a class="nav-link" href="index.html#contacts" data-section-link="contacts"
+                >Контакты</a
+              >
+            </div>
+
+            <div class="nav-actions">
+              <button
+                class="theme-toggle"
+                type="button"
+                data-theme-toggle
+                aria-label="Переключить тему"
+                aria-pressed="false"
+              >
+                <img
+                  class="theme-toggle__icon theme-toggle__icon--light"
+                  src="assets/icons/light-mode.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  class="theme-toggle__icon theme-toggle__icon--dark"
+                  src="assets/icons/dark-mode.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </button>
+
+              <button
+                class="menu-toggle"
+                type="button"
+                aria-label="Открыть боковое меню"
+                aria-controls="sideMenu"
+                aria-expanded="false"
+              >
+                <img
+                  class="menu-toggle__icon"
+                  src="assets/icons/hamburger-dark.svg"
+                  data-menu-icon-hamburger-light="assets/icons/hamburger.svg"
+                  data-menu-icon-hamburger-dark="assets/icons/hamburger-dark.svg"
+                  data-menu-icon-close-light="assets/icons/close.svg"
+                  data-menu-icon-close-dark="assets/icons/close-dark.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </button>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <div class="menu-overlay" data-menu-overlay></div>
+    <aside class="side-menu" id="sideMenu" aria-hidden="true" aria-label="Боковое меню" inert>
+      <nav class="side-menu__nav" aria-label="Навигация бокового меню">
+        <a class="side-menu__link" href="index.html#top">Главная</a>
+        <a class="side-menu__link" href="index.html#team">О нас</a>
+        <a class="side-menu__link" href="index.html#rules">Устав</a>
+        <a class="side-menu__link" href="index.html#contacts">Контакты</a>
+        <a class="side-menu__link" href="disclaimer.html">Отказ от ответственности</a>
+        <a class="side-menu__link" href="news.html">Новости</a>
+        <a class="side-menu__link" href="developments.html">Наши разработки</a>
+      </nav>
+      <div class="side-menu__footer" aria-label="Информация о клане">
+        <p class="side-menu__footer-line">Клан «Змеиное логово»</p>
+        <p class="side-menu__footer-line">
+          <a
+            class="side-menu__footer-link"
+            href="https://www.mafiaonline.ru/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >mafiaonline.ru</a
+          >
+          — интерактивная онлайн-игра
+        </p>
+      </div>
+    </aside>
+
+    <main class="placeholder-page" id="top">
+      <section class="placeholder-card">
+        <p class="section-kicker">Будущий раздел</p>
+        <h1>Наши разработки</h1>
+        <p>Здесь можно будет разместить инструменты, заметки и проекты клана.</p>
+        <a class="button-primary" href="index.html#top">Вернуться на главную</a>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <p class="site-footer__line">Клан «Змеиное логово»</p>
+        <p class="site-footer__line">
+          <a
+            class="site-footer__link"
+            href="https://www.mafiaonline.ru/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >mafiaonline.ru</a
+          >
+          — интерактивная онлайн-игра
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Новости клана «Змеиное логово» проекта «Мафия онлайн»." />
+    <meta name="theme-color" content="#08131f" />
+    <title>Новости | Змеиное логово</title>
+    <link
+      rel="icon"
+      href="assets/icon-dark.svg"
+      type="image/svg+xml"
+      data-theme-favicon
+      data-theme-src-light="assets/icon.svg"
+      data-theme-src-dark="assets/icon-dark.svg"
+    />
+    <script src="js/theme-init.js"></script>
+    <link rel="stylesheet" href="css/styles.css" />
+    <script src="js/main.js" defer></script>
+  </head>
+  <body class="inner-page">
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-logo" href="index.html#top" aria-label="На главную страницу">
+          <img
+            src="assets/icon-dark.svg"
+            data-theme-src-light="assets/icon.svg"
+            data-theme-src-dark="assets/icon-dark.svg"
+            alt=""
+          />
+        </a>
+
+        <nav class="site-nav" aria-label="Основная навигация">
+          <div class="nav-inner">
+            <div class="nav-links" aria-label="Разделы главной страницы">
+              <a class="nav-link" href="index.html#top" data-section-link="top">Главная</a>
+              <a class="nav-link" href="index.html#team" data-section-link="team">О нас</a>
+              <a class="nav-link" href="index.html#rules" data-section-link="rules">Устав</a>
+              <a class="nav-link" href="index.html#contacts" data-section-link="contacts"
+                >Контакты</a
+              >
+            </div>
+
+            <div class="nav-actions">
+              <button
+                class="theme-toggle"
+                type="button"
+                data-theme-toggle
+                aria-label="Переключить тему"
+                aria-pressed="false"
+              >
+                <img
+                  class="theme-toggle__icon theme-toggle__icon--light"
+                  src="assets/icons/light-mode.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  class="theme-toggle__icon theme-toggle__icon--dark"
+                  src="assets/icons/dark-mode.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </button>
+
+              <button
+                class="menu-toggle"
+                type="button"
+                aria-label="Открыть боковое меню"
+                aria-controls="sideMenu"
+                aria-expanded="false"
+              >
+                <img
+                  class="menu-toggle__icon"
+                  src="assets/icons/hamburger-dark.svg"
+                  data-menu-icon-hamburger-light="assets/icons/hamburger.svg"
+                  data-menu-icon-hamburger-dark="assets/icons/hamburger-dark.svg"
+                  data-menu-icon-close-light="assets/icons/close.svg"
+                  data-menu-icon-close-dark="assets/icons/close-dark.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </button>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <div class="menu-overlay" data-menu-overlay></div>
+    <aside class="side-menu" id="sideMenu" aria-hidden="true" aria-label="Боковое меню" inert>
+      <nav class="side-menu__nav" aria-label="Навигация бокового меню">
+        <a class="side-menu__link" href="index.html#top">Главная</a>
+        <a class="side-menu__link" href="index.html#team">О нас</a>
+        <a class="side-menu__link" href="index.html#rules">Устав</a>
+        <a class="side-menu__link" href="index.html#contacts">Контакты</a>
+        <a class="side-menu__link" href="disclaimer.html">Отказ от ответственности</a>
+        <a class="side-menu__link" href="news.html">Новости</a>
+        <a class="side-menu__link" href="developments.html">Наши разработки</a>
+      </nav>
+      <div class="side-menu__footer" aria-label="Информация о клане">
+        <p class="side-menu__footer-line">Клан «Змеиное логово»</p>
+        <p class="side-menu__footer-line">
+          <a
+            class="side-menu__footer-link"
+            href="https://www.mafiaonline.ru/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >mafiaonline.ru</a
+          >
+          — интерактивная онлайн-игра
+        </p>
+      </div>
+    </aside>
+
+    <main class="placeholder-page news-page" id="top">
+      <section class="placeholder-card news-shell" aria-labelledby="news-title">
+        <p class="section-kicker">события логова</p>
+        <h1 id="news-title">Новости</h1>
+
+        <div class="news-list" aria-label="Список новостей">
+          <article class="news-card" data-news-card tabindex="0">
+            <div class="news-card__media">
+              <img
+                src="assets/news-avatar_4-dark.png"
+                data-theme-src-light="assets/news-avatar_4.png"
+                data-theme-src-dark="assets/news-avatar_4-dark.png"
+                alt=""
+                aria-hidden="true"
+              />
+            </div>
+            <div class="news-card__intro">
+              <div class="news-card__headline">
+                <time class="news-card__kicker" datetime="2026-04-01">01.04.2026</time>
+                <h2 class="news-card__title">Сумерки. Сага: Рассвет</h2>
+              </div>
+              <div class="news-card__meta">
+                <button
+                  class="news-card__toggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="news-card-0-details"
+                  aria-label="Развернуть описание новости «Сумерки. Сага: Рассвет»"
+                >
+                  <span class="news-card__toggle-icon" aria-hidden="true"></span>
+                </button>
+                <p class="news-card__subtitle">
+                  Клан «Змеиное логово» провёл марафон из 15 партий на Сумеречном переулке
+                </p>
+              </div>
+            </div>
+            <div
+              class="news-card__details"
+              id="news-card-0-details"
+              data-news-details
+              aria-hidden="true"
+              inert
+            >
+              <div class="news-card__body">
+                <p>
+                  Первого апреля, в день дурака, мы провели этот чудесный марафон. При определении
+                  победителей оценивался не только вин-рейт<sup>*</sup>, но и импакт<sup>**</sup>
+                  игрока в партиях. Кроме того, участники соревновались за возможность сыграть за
+                  мафию вместе с представителями нашего клана. Поздравляем победителей!
+                </p>
+                <p class="news-card__more"><sup>*</sup>«Вин-рейт» — процент побед игрока</p>
+                <p class="news-card__more">
+                  <sup>**</sup>«Импакт» — индивидуальный вклад игрока в победу.
+                </p>
+                <p class="news-card__more">
+                  Подробнее:
+                  <a
+                    href="https://www.mafiaonline.ru/forum/viewtopic.php?id=534227"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >пост на форуме</a
+                  >
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <article class="news-card" data-news-card tabindex="0">
+            <div class="news-card__media">
+              <img
+                src="assets/news-avatar_3-dark.png"
+                data-theme-src-light="assets/news-avatar_3.png"
+                data-theme-src-dark="assets/news-avatar_3-dark.png"
+                alt=""
+                aria-hidden="true"
+              />
+            </div>
+            <div class="news-card__intro">
+              <div class="news-card__headline">
+                <time class="news-card__kicker" datetime="2026-01-25">25.01.2026</time>
+                <h2 class="news-card__title">Рывок. Атака. Победа.</h2>
+              </div>
+              <div class="news-card__meta">
+                <button
+                  class="news-card__toggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="news-card-1-details"
+                  aria-label="Развернуть описание новости «Рывок. Атака. Победа.»"
+                >
+                  <span class="news-card__toggle-icon" aria-hidden="true"></span>
+                </button>
+                <p class="news-card__subtitle">
+                  Клан «Змеиное логово» провёл мини-турнир «Рывок. Атака. Победа.»
+                </p>
+              </div>
+            </div>
+            <div
+              class="news-card__details"
+              id="news-card-1-details"
+              data-news-details
+              aria-hidden="true"
+              inert
+            >
+              <div class="news-card__body">
+                <p>
+                  Ровно через месяц после проведения Новогоднего марафона мы провели мини-турнир, в
+                  котором игроки соревновались в количестве выигранных партий в условиях
+                  ограниченного времени. Благодарим всех за участие и поздравляем победителей!
+                </p>
+                <p class="news-card__more">
+                  Подробнее:
+                  <a
+                    href="https://www.mafiaonline.ru/forum/viewtopic.php?id=534227"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >пост на форуме</a
+                  >
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <article class="news-card" data-news-card tabindex="0">
+            <div class="news-card__media">
+              <img
+                src="assets/news-avatar_2-dark.png"
+                data-theme-src-light="assets/news-avatar_2.png"
+                data-theme-src-dark="assets/news-avatar_2-dark.png"
+                alt=""
+                aria-hidden="true"
+              />
+            </div>
+            <div class="news-card__intro">
+              <div class="news-card__headline">
+                <time class="news-card__kicker" datetime="2025-12-24">24.12.2025</time>
+                <h2 class="news-card__title">Новогодний марафон</h2>
+              </div>
+              <div class="news-card__meta">
+                <button
+                  class="news-card__toggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="news-card-2-details"
+                  aria-label="Развернуть описание новости «Новогодний марафон»"
+                >
+                  <span class="news-card__toggle-icon" aria-hidden="true"></span>
+                </button>
+                <p class="news-card__subtitle">
+                  Клан «Змеиное логово» провёл Новогодний марафон на Сумеречном переулке
+                </p>
+              </div>
+            </div>
+            <div
+              class="news-card__details"
+              id="news-card-2-details"
+              data-news-details
+              aria-hidden="true"
+              inert
+            >
+              <div class="news-card__body">
+                <p>
+                  В канун католического Рождества у всех игроков проекта «Мафия онлайн» была
+                  замечательная возможность выиграть до 1000 маф в партиях, проводимых с участием
+                  представителей клана «Змеиное логово» на Сумеречном переулке. Благодарим всех за
+                  участие и поздравляем победителей!
+                </p>
+                <p class="news-card__more">
+                  Подробнее:
+                  <a
+                    href="https://www.mafiaonline.ru/forum/viewtopic.php?id=534094"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >пост на форуме</a
+                  >
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <article class="news-card" data-news-card tabindex="0">
+            <div class="news-card__media">
+              <img
+                src="assets/news-avatar_1-dark.png"
+                data-theme-src-light="assets/news-avatar_1.png"
+                data-theme-src-dark="assets/news-avatar_1-dark.png"
+                alt=""
+                aria-hidden="true"
+              />
+            </div>
+            <div class="news-card__intro">
+              <div class="news-card__headline">
+                <time class="news-card__kicker" datetime="2025-12-10">10.12.2025</time>
+                <h2 class="news-card__title">Турнир дуэлянтов II</h2>
+              </div>
+              <div class="news-card__meta">
+                <button
+                  class="news-card__toggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="news-card-3-details"
+                  aria-label="Развернуть описание новости «Турнир дуэлянтов II»"
+                >
+                  <span class="news-card__toggle-icon" aria-hidden="true"></span>
+                </button>
+                <p class="news-card__subtitle">
+                  Клан «Змеиное логово» провёл свой первый неофициальный турнир.
+                </p>
+              </div>
+            </div>
+            <div
+              class="news-card__details"
+              id="news-card-3-details"
+              data-news-details
+              aria-hidden="true"
+              inert
+            >
+              <div class="news-card__body">
+                <p>
+                  Вскоре после своего появления, клан «Змеиное логово» стал принимать активное
+                  участие в жизни проекта «Мафия онлайн». И уже 10 декабря мы провели свой первый
+                  неофициальный турнир «Турнир дуэлянтов II», в котором игроки соревновались друг с
+                  другом в выдержке и точности внутренних часов. Это уже второй такой турнир,
+                  <a
+                    href="https://www.mafiaonline.ru/forum/viewtopic.php?id=532609"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >первый</a
+                  >
+                  проводился в далёком 2023 году, и мы были рады возродить эту традицию. Спасибо
+                  всем кто пришёл, поздравляем лучших дуэлянтов и надеемся, что этот турнир станет
+                  традицией нашего клана!
+                </p>
+                <p class="news-card__more">
+                  Подробнее:
+                  <a
+                    href="https://www.mafiaonline.ru/forum/viewtopic.php?id=534076"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >пост на форуме</a
+                  >
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <article class="news-card" data-news-card tabindex="0">
+            <div class="news-card__media">
+              <img
+                src="assets/news-avatar_0-dark.png"
+                data-theme-src-light="assets/news-avatar_0.png"
+                data-theme-src-dark="assets/news-avatar_0-dark.png"
+                alt=""
+                aria-hidden="true"
+              />
+            </div>
+            <div class="news-card__intro">
+              <div class="news-card__headline">
+                <time class="news-card__kicker" datetime="2025-12-06">06.12.2025</time>
+                <h2 class="news-card__title">Я родился! ©</h2>
+              </div>
+              <div class="news-card__meta">
+                <button
+                  class="news-card__toggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="news-card-4-details"
+                  aria-label="Развернуть описание новости «Я родился! ©»"
+                >
+                  <span class="news-card__toggle-icon" aria-hidden="true"></span>
+                </button>
+                <p class="news-card__subtitle">
+                  Клан «Змеиное логово» был официально зарегистрирован.
+                </p>
+              </div>
+            </div>
+            <div
+              class="news-card__details"
+              id="news-card-4-details"
+              data-news-details
+              aria-hidden="true"
+              inert
+            >
+              <div class="news-card__body">
+                <p>
+                  В этот прекрасный день нам удалось согласовать все формальности, найти первых
+                  участников и убедить главу Авторитетов <i>Vera</i> официально зарегистрировать наш
+                  клан. С этого момента и началась история «Змеиного логова».
+                </p>
+                <p class="news-card__more">
+                  Подробнее:
+                  <a href="https://t.me/tut_logovo/5" target="_blank" rel="noopener noreferrer"
+                    >пост официального Telegram-канала</a
+                  >
+                </p>
+                <p class="news-card__more">
+                  Доступ к Telegram может быть ограничен на территории России
+                </p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <p class="site-footer__line">Клан «Змеиное логово»</p>
+        <p class="site-footer__line">
+          <a
+            class="site-footer__link"
+            href="https://www.mafiaonline.ru/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >mafiaonline.ru</a
+          >
+          — интерактивная онлайн-игра
+        </p>
+      </div>
+    </footer>
+
+    <button class="back-to-top" type="button" aria-label="Вернуться наверх"></button>
+  </body>
+</html>
