@@ -4,6 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Отказ от ответственности сайта клана «Змеиное логово»." />
+    <link rel="canonical" href="https://snakepit.ru/disclaimer.html" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Змеиное логово" />
+    <meta property="og:title" content="Отказ от ответственности | Змеиное логово" />
+    <meta
+      property="og:description"
+      content="Отказ от ответственности сайта клана «Змеиное логово»."
+    />
+    <meta property="og:url" content="https://snakepit.ru/disclaimer.html" />
+    <meta property="og:image" content="https://snakepit.ru/social-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Отказ от ответственности | Змеиное логово" />
+    <meta
+      name="twitter:description"
+      content="Отказ от ответственности сайта клана «Змеиное логово»."
+    />
+    <meta name="twitter:image" content="https://snakepit.ru/social-image.png" />
     <meta name="theme-color" content="#08131f" />
     <title>Отказ от ответственности | Змеиное логово</title>
     <link
@@ -11,28 +29,78 @@
       href="assets/icon-dark.svg"
       type="image/svg+xml"
       data-theme-favicon
-      data-theme-src-light="assets/icon.svg"
-      data-theme-src-dark="assets/icon-dark.svg"
+      data-theme-src-light="icon-light"
+      data-theme-src-dark="icon-dark"
     />
-    <script src="js/theme-init.js"></script>
+    <script>
+      (() => {
+        let theme = "dark";
+        try {
+          const savedTheme = localStorage.getItem("theme");
+          theme =
+            savedTheme === "light" || savedTheme === "dark"
+              ? savedTheme
+              : matchMedia("(prefers-color-scheme: light)").matches
+                ? "light"
+                : "dark";
+        } catch {
+          theme = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+        }
+        document.documentElement.dataset.theme = theme;
+        document.querySelector('meta[name="theme-color"]').content =
+          theme === "light" ? "#f6f8f3" : "#08131f";
+
+        const initialHash = location.hash;
+        window.__snakeInitialHash = initialHash;
+        window.__snakeManualScroll = false;
+
+        if (initialHash) {
+          history.replaceState(history.state, "", location.pathname + location.search);
+          const markManualScroll = () => {
+            window.__snakeManualScroll = true;
+          };
+          addEventListener("wheel", markManualScroll, { capture: true, passive: true });
+          addEventListener("touchstart", markManualScroll, { capture: true, passive: true });
+          addEventListener("pointerdown", markManualScroll, { capture: true, passive: true });
+          addEventListener(
+            "keydown",
+            (event) => {
+              if (
+                event.key === "ArrowUp" ||
+                event.key === "ArrowDown" ||
+                event.key === "PageUp" ||
+                event.key === "PageDown" ||
+                event.key === "Home" ||
+                event.key === "End" ||
+                event.key === " "
+              ) {
+                markManualScroll();
+              }
+            },
+            { capture: true }
+          );
+        }
+      })();
+    </script>
     <link rel="stylesheet" href="css/styles.css" />
-    <script src="js/main.js" defer></script>
+    <script type="module" src="js/main.js"></script>
   </head>
   <body class="inner-page">
     <header class="site-header">
       <div class="site-header__inner">
         <a class="site-logo" href="index.html#top" aria-label="На главную страницу">
           <img
-            src="assets/icon-dark.svg"
-            data-theme-src-light="assets/icon.svg"
-            data-theme-src-dark="assets/icon-dark.svg"
+            data-theme-src-light="icon-light"
+            data-theme-src-dark="icon-dark"
+            width="128"
+            height="128"
             alt=""
           />
         </a>
 
         <nav class="site-nav" aria-label="Основная навигация">
           <div class="nav-inner">
-            <div class="nav-links" aria-label="Разделы главной страницы">
+            <div class="nav-links" role="group" aria-label="Разделы главной страницы">
               <a class="nav-link" href="index.html#top" data-section-link="top">Главная</a>
               <a class="nav-link" href="index.html#team" data-section-link="team">О нас</a>
               <a class="nav-link" href="index.html#rules" data-section-link="rules">Устав</a>
@@ -52,12 +120,16 @@
                 <img
                   class="theme-toggle__icon theme-toggle__icon--light"
                   src="assets/icons/light-mode.svg"
+                  width="512"
+                  height="512"
                   alt=""
                   aria-hidden="true"
                 />
                 <img
                   class="theme-toggle__icon theme-toggle__icon--dark"
                   src="assets/icons/dark-mode.svg"
+                  width="512"
+                  height="512"
                   alt=""
                   aria-hidden="true"
                 />
@@ -73,10 +145,12 @@
                 <img
                   class="menu-toggle__icon"
                   src="assets/icons/hamburger-dark.svg"
-                  data-menu-icon-hamburger-light="assets/icons/hamburger.svg"
-                  data-menu-icon-hamburger-dark="assets/icons/hamburger-dark.svg"
-                  data-menu-icon-close-light="assets/icons/close.svg"
-                  data-menu-icon-close-dark="assets/icons/close-dark.svg"
+                  data-menu-icon-hamburger-light="hamburger-light"
+                  data-menu-icon-hamburger-dark="hamburger-dark"
+                  data-menu-icon-close-light="close-light"
+                  data-menu-icon-close-dark="close-dark"
+                  width="512"
+                  height="512"
                   alt=""
                   aria-hidden="true"
                 />
@@ -88,13 +162,40 @@
     </header>
 
     <div class="menu-overlay" data-menu-overlay></div>
-    <aside class="side-menu" id="sideMenu" aria-hidden="true" aria-label="Боковое меню" inert>
+    <aside
+      class="side-menu"
+      id="sideMenu"
+      aria-hidden="true"
+      aria-label="Боковое меню"
+      tabindex="-1"
+      inert
+    >
+      <button
+        class="side-menu__close"
+        type="button"
+        data-menu-close
+        aria-label="Закрыть боковое меню"
+        title="Закрыть боковое меню"
+      >
+        <img
+          class="side-menu__close-icon"
+          src="assets/icons/close-dark.svg"
+          data-theme-src-light="close-light"
+          data-theme-src-dark="close-dark"
+          width="512"
+          height="512"
+          alt=""
+          aria-hidden="true"
+        />
+      </button>
       <nav class="side-menu__nav" aria-label="Навигация бокового меню">
         <a class="side-menu__link" href="index.html#top">Главная</a>
         <a class="side-menu__link" href="index.html#team">О нас</a>
         <a class="side-menu__link" href="index.html#rules">Устав</a>
         <a class="side-menu__link" href="index.html#contacts">Контакты</a>
-        <a class="side-menu__link" href="disclaimer.html">Отказ от ответственности</a>
+        <a class="side-menu__link is-active" href="disclaimer.html" aria-current="page"
+          >Отказ от ответственности</a
+        >
         <a class="side-menu__link" href="news.html">Новости</a>
         <a class="side-menu__link" href="developments.html">Наши разработки</a>
       </nav>
@@ -119,86 +220,113 @@
         <h1 id="disclaimer-title">Отказ от ответственности</h1>
         <div class="legal-disclaimer__content">
           <p>
-            Игра «Мафия онлайн», размещенная в сети Интернет по адресу
-            <a href="https://www.mafiaonline.ru" target="_blank" rel="noopener noreferrer"
-              >mafiaonline.ru</a
-            >, является программой для ЭВМ и представляет собой совокупность данных и команд,
+            Игра «Мафия онлайн» (далее — Проект), размещённая в сети Интернет по адресу
+            <a href="https://www.mafiaonline.ru/" target="_blank" rel="noopener noreferrer"
+              >https://www.mafiaonline.ru/</a>, является программой для ЭВМ и представляет собой совокупность данных и команд,
             предназначенных для функционирования электронных вычислительных машин, включая
-            подготовительные материалы, полученные в ходе ее разработки, а также создаваемые ею
-            аудиовизуальные отображения.
-          </p>
-          <p>
-            Права на игру, ее название, материалы и связанные объекты принадлежат соответствующим
-            правообладателям. Условия использования проекта «Мафия онлайн» опубликованы на странице
+            подготовительные материалы, полученные в ходе её разработки, а также создаваемые ею
+            аудиовизуальные отображения. Права на игру «Мафия онлайн», её название, программное
+            обеспечение, графические материалы, элементы оформления и иные охраняемые объекты
+            принадлежат соответствующим правообладателям. Условия пользовательского соглашения
+            Проекта опубликованы на странице
             <a href="https://www.mafiaonline.ru/terms.php" target="_blank" rel="noopener noreferrer"
-              >mafiaonline.ru/terms.php</a
-            >.
+              >https://www.mafiaonline.ru/terms.php</a>.
           </p>
           <p>
-            «Змеиное логово» — клан, зарегистрированный на проекте «Мафия онлайн». Настоящий сайт
-            является информационным ресурсом клана «Змеиное логово», созданным участниками клана в
-            информационных целях, и не является официальным сайтом проекта «Мафия онлайн». Вся
-            информация на сайте носит исключительно ознакомительный характер.
+            «Змеиное логово» — клан, зарегистрированный в Проекте. Сайт
+            <a href="https://snakepit.ru/" target="_blank" rel="noopener noreferrer"
+              >https://snakepit.ru/</a> (далее — Сайт)
+            является информационным ресурсом клана «Змеиное логово». Он не является официальным
+            сайтом Проекта, не управляется его правообладателем или администрацией и не представляет
+            их интересы.
           </p>
           <p>
-            При использовании информационных услуг проекта «Мафия онлайн» пользователь обязан
-            соблюдать правила игры и условия, размещенные по ссылке
-            <a href="https://www.mafiaonline.ru/terms.php" target="_blank" rel="noopener noreferrer"
-              >mafiaonline.ru/terms.php</a
-            >, а также уведомлен о возможных последствиях нарушений, включая меры, предусмотренные
+            Название игры, связанные с ней обозначения, изображения и иные материалы используются на
+            Сайте исключительно в информационных целях и для освещения деятельности клана. Такое
+            использование не означает наличия официальной связи между авторами Сайта и
+            правообладателем игры или предоставления авторам Сайта каких-либо прав на соответствующие
+            объекты.
+          </p>
+          <p>
+            Пользователи Проекта обязаны соблюдать действующие условия использования, правила игры и
+            законы Проекта, опубликованные на странице
             <a href="https://avt.mafiaonline.ru/laws/" target="_blank" rel="noopener noreferrer"
-              >законами проекта</a
-            >. Авторы сайта не имеют ни прямого, ни косвенного отношения к
-            <a href="https://avt.mafiaonline.ru/" target="_blank" rel="noopener noreferrer"
-              >Администрации проекта «Мафия онлайн»</a
-            >
-            и не несут ответственности за действия её представителей.
+              >https://avt.mafiaonline.ru/laws/</a>. Официальную и актуальную информацию о правилах следует проверять непосредственно на
+            ресурсах Проекта.
           </p>
           <p>
-            Для взаимодействия друг с другом вне рамок проекта «Мафия онлайн» многие игроки
-            используют мессенджер Telegram, доступ к которому может быть ограничен на территории
-            России.
-          </p>
-          <p>
-            Формулировка «Регистрируйся и вступай в наше логово!» не означает гарантированный прием
-            в клан «Змеиное логово» после регистрации на проекте. Вступление возможно только при
-            соблюдении требований проекта к персонажам для нахождения в кланах (включая, но не
-            ограничиваясь,
+            Формулировка «Регистрируйся и вступай в наше логово!» носит информационный и
+            пригласительный характер и не гарантирует приём в клан после регистрации. Вступление в
+            клан возможно при соблюдении правил для кланов, опубликованных на странице
+            <a href="https://www.mafiaonline.ru/clans/rules" target="_blank" rel="noopener noreferrer"
+              >https://www.mafiaonline.ru/clans/rules</a>, и положений устава «Змеиного логова», опубликованного на странице
             <a
-              href="https://www.mafiaonline.ru/clans/rules"
+              href="https://www.mafiaonline.ru/clan/logovo/statute"
               target="_blank"
               rel="noopener noreferrer"
-              >mafiaonline.ru/clans/rules</a
-            >) и требований устава клана, включая необходимость согласия 80% участников (см. раздел
-            <a href="index.html#rules">«Устав»</a>).
+              >https://www.mafiaonline.ru/clan/logovo/statute</a>.
           </p>
           <p>
-            Характеристики игроков не являются отражением официальной позиции Администрации проекта
-            «Мафия онлайн». Все текстовые комментарии являются полностью выдуманными, все совпадения
-            случайны.
+            На Сайте размещены карточки, характеристики и описания игровых персонажей Проекта.
+            Отдельные элементы этих материалов могут являться художественным вымыслом, носить
+            оценочный или юмористический характер и не должны восприниматься как утверждения о
+            реальных лицах или обстоятельствах. Возможные совпадения вымышленных деталей с реальными
+            лицами или событиями случайны.
           </p>
           <p>
-            Контактная информация о пользователях и участниках клана используется только на
-            основании открытых источников, включая страницы
+            Сведения о составе клана и его участниках формируются на основе информации из
+            общедоступных разделов Проекта, в том числе со страницы клана «Змеиное логово», открытых
+            страниц игровых персонажей, а также сведений, предоставленных самими участниками клана
+            для размещения на Сайте. На Сайте могут быть указаны игровой никнейм, принадлежность
+            персонажа к клану и иные сведения, открыто размещённые владельцем персонажа на сайте
+            Проекта.
+          </p>
+          <p>
+            Пункты 3.2.2 и 3.2.3 политики конфиденциальности Проекта, опубликованной на странице
             <a
-              href="https://www.mafiaonline.ru/clan/logovo"
+              href="https://www.mafiaonline.ru/conf.php"
               target="_blank"
               rel="noopener noreferrer"
-              >mafiaonline.ru/clan/logovo</a
-            >
-            и
-            <a
-              href="https://www.mafiaonline.ru/info/Nirvana"
-              target="_blank"
-              rel="noopener noreferrer"
-              >mafiaonline.ru/info/Nirvana</a
-            >.
+              >https://www.mafiaonline.ru/conf.php</a>, относят игровой никнейм и другие сведения, добровольно размещаемые пользователем при
+            использовании Проекта, к данным, предоставляемым самим пользователем. Эта политика
+            конфиденциальности действует в отношении сайта Проекта. Ссылка на неё приводится
+            исключительно для указания первоначального источника и характера сведений, размещённых
+            пользователями, и не означает распространения её положений на Сайт. Факт открытого
+            размещения сведений на сайте Проекта не рассматривается авторами Сайта как безусловное
+            согласие на их неограниченное дальнейшее распространение.
           </p>
           <p>
-            Если Вы считаете, что использование какого-либо элемента страницы нарушает Ваши права,
-            является неприемлемым для Вас или порочит Вашу репутацию, пожалуйста, свяжитесь с нами
-            по адресу электронной почты, указанной в разделе
-            <a href="index.html#contacts">Контакты</a>.
+            Сайт не имеет доступа к паролям, закрытой переписке, регистрационным данным, непубличным
+            адресам электронной почты и другим сведениям, отсутствующим в открытых разделах Проекта
+            или не предоставленным самими участниками клана. Сайт не использует файлы cookie.
+          </p>
+          <p>
+            На Сайте могут размещаться ссылки на сторонние ресурсы, включая ресурсы Проекта и
+            мессенджер Telegram. При переходе по таким ссылкам применяются правила использования и
+            политики конфиденциальности соответствующих ресурсов. Доступ к Telegram, в том числе к
+            отдельным функциям мессенджера, может быть ограничен на территории России, вследствие
+            чего соответствующие ссылки или материалы могут быть недоступны.
+          </p>
+          <p>
+            Авторы Сайта не управляют сторонними ресурсами и не контролируют их содержание,
+            доступность, техническую работу и порядок обработки пользовательских данных. Авторы
+            Сайта принимают разумные меры для поддержания опубликованной информации в актуальном
+            состоянии, однако не гарантируют её абсолютную полноту, точность и своевременное
+            обновление. Сведения о правилах Проекта, составе клана, игровых персонажах и иных
+            обстоятельствах могут изменяться без одновременного обновления Сайта. При наличии
+            расхождений следует руководствоваться информацией, опубликованной на официальных
+            ресурсах Проекта.
+          </p>
+          <p>
+            Владелец игрового персонажа, правообладатель или иное заинтересованное лицо может
+            обратиться с требованием исправить или дополнить размещённую информацию, ограничить
+            доступ к ней либо удалить её. Обращение следует направить по адресу электронной почты,
+            указанному в
+            <a href="index.html#contacts">разделе «Контакты»</a>. В обращении желательно указать
+            адрес страницы со спорным материалом, описание материала, основание обращения, требуемое
+            действие, а также сведения, подтверждающие права или законный интерес заявителя в
+            отношении соответствующего материала или игрового персонажа. Обращение будет рассмотрено,
+            и при наличии достаточных оснований авторы Сайта примут необходимые меры.
           </p>
         </div>
         <a class="button-primary" href="index.html#top">Вернуться на главную</a>

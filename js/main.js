@@ -1,3 +1,5 @@
+import { resolveThemeAsset } from "./theme-assets.js";
+
 (function () {
   const root = document.documentElement;
   const body = document.body;
@@ -9,6 +11,7 @@
   const menuToggleIcon = menuToggle?.querySelector(".menu-toggle__icon");
   const heroSymbol = document.querySelector(".hero-symbol");
   const sideMenu = document.querySelector(".side-menu");
+  const menuClose = sideMenu?.querySelector("[data-menu-close]");
   const overlay = document.querySelector("[data-menu-overlay]");
   const backToTop = document.querySelector(".back-to-top");
   const newsCards = Array.from(document.querySelectorAll("[data-news-card]"));
@@ -24,6 +27,9 @@
   const isHomePage = Boolean(document.querySelector(".hero#top"));
   const THEME_KEY = "theme";
   const HASH_SCROLL_GAP = 0;
+  const NAVIGATION_SCROLL_DURATION = 480;
+  const PAGE_EXIT_DURATION = 180;
+  const THEME_TRANSITION_DURATION = 320;
   const THEME_COLORS = {
     dark: "#08131f",
     light: "#f6f8f3",
@@ -31,6 +37,7 @@
 
   let savedScrollY = 0;
   let menuIsOpen = false;
+  let menuOpener = null;
   let headerSyncFrame = 0;
   let activeNavFrame = 0;
   let cachedHeaderHeight = 0;
@@ -39,6 +46,10 @@
   let currentActiveSectionId = "";
   let heroSymbolIsInView = false;
   let heroSymbolFallbackFrame = 0;
+  let pendingNavigationFrame = 0;
+  let navigationScrollFrame = 0;
+  let pageNavigationTimer = 0;
+  let themeTransitionTimer = 0;
 
   const storage = {
     get(key) {
@@ -93,14 +104,13 @@
       return 0;
     }
 
-    root.style.removeProperty("--nav-height");
     const nextHeight = getHeaderHeight();
-    cachedHeaderHeight = nextHeight;
 
-    if (nextHeight > 0) {
+    if (nextHeight > 0 && nextHeight !== cachedHeaderHeight) {
       root.style.setProperty("--nav-height", `${nextHeight}px`);
     }
 
+    cachedHeaderHeight = nextHeight;
     return nextHeight;
   };
 
@@ -192,31 +202,76 @@
     history.replaceState(null, "", nextHash);
   };
 
+  const cancelNavigationScrollAnimation = () => {
+    if (!navigationScrollFrame) {
+      return;
+    }
+
+    window.cancelAnimationFrame(navigationScrollFrame);
+    navigationScrollFrame = 0;
+  };
+
+  const animateNavigationScroll = (targetTop) => {
+    cancelNavigationScrollAnimation();
+
+    const startTop = getScrollY();
+    const distance = targetTop - startTop;
+
+    if (shouldReduceMotion() || Math.abs(distance) < 1) {
+      window.scrollTo({ top: targetTop, left: 0, behavior: "auto" });
+      return;
+    }
+
+    const startTime = performance.now();
+    const easeInOutCubic = (progress) =>
+      progress < 0.5
+        ? 4 * progress * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+    const step = (timestamp) => {
+      const progress = Math.min(1, (timestamp - startTime) / NAVIGATION_SCROLL_DURATION);
+      const nextTop = startTop + distance * easeInOutCubic(progress);
+      window.scrollTo({ top: nextTop, left: 0, behavior: "auto" });
+
+      if (progress < 1) {
+        navigationScrollFrame = window.requestAnimationFrame(step);
+        return;
+      }
+
+      navigationScrollFrame = 0;
+      window.scrollTo({ top: targetTop, left: 0, behavior: "auto" });
+    };
+
+    navigationScrollFrame = window.requestAnimationFrame(step);
+  };
+
   const scrollToHash = (hash, options = {}) => {
     const { behavior = "auto", historyMode = "none" } = options;
-    const nextBehavior = behavior === "smooth" && shouldReduceMotion() ? "auto" : behavior;
 
     if (!hash) {
       return false;
     }
 
     const headerHeight = syncScrollMetrics();
+    let nextTop = 0;
 
-    if (hash === "#top") {
-      window.scrollTo({ top: 0, left: 0, behavior: nextBehavior });
-      updateHistoryHash("#top", historyMode);
-      return true;
+    if (hash !== "#top") {
+      const target = getTargetFromHash(hash);
+      if (!target) {
+        return false;
+      }
+
+      const targetTop = target.getBoundingClientRect().top + getScrollY();
+      nextTop = Math.max(0, Math.round(targetTop - headerHeight - HASH_SCROLL_GAP));
     }
 
-    const target = getTargetFromHash(hash);
-    if (!target) {
-      return false;
+    if (behavior === "smooth" && !shouldReduceMotion()) {
+      animateNavigationScroll(nextTop);
+    } else {
+      cancelNavigationScrollAnimation();
+      window.scrollTo({ top: nextTop, left: 0, behavior: "auto" });
     }
 
-    const targetTop = target.getBoundingClientRect().top + getScrollY();
-    const nextTop = Math.max(0, Math.round(targetTop - headerHeight - HASH_SCROLL_GAP));
-
-    window.scrollTo({ top: nextTop, left: 0, behavior: nextBehavior });
     updateHistoryHash(hash, historyMode);
     return true;
   };
@@ -253,8 +308,10 @@
       syncScrollMetrics();
     }
 
-    const scrollY = getScrollY();
-    const activationLine = scrollY + cachedHeaderHeight + HASH_SCROLL_GAP + 1;
+    const scrollY = menuIsOpen ? savedScrollY : getScrollY();
+    const contentViewportHeight = Math.max(0, window.innerHeight - cachedHeaderHeight);
+    const activationLine =
+      scrollY + cachedHeaderHeight + contentViewportHeight / 2 + HASH_SCROLL_GAP + 1;
     let activeSectionId = cachedSectionMetrics[0]?.id || homeSectionTargets[0].id;
 
     cachedSectionMetrics.forEach((section) => {
@@ -357,12 +414,42 @@
 
   const syncThemeToggleIcons = () => {
     if (lightThemeIcon) {
-      lightThemeIcon.src = "assets/icons/light-mode.svg";
+      const lightThemeIconSource = resolveThemeAsset("light-mode");
+
+      if (lightThemeIconSource) {
+        lightThemeIcon.src = lightThemeIconSource;
+      }
     }
 
     if (darkThemeIcon) {
-      darkThemeIcon.src = "assets/icons/dark-mode.svg";
+      const darkThemeIconSource = resolveThemeAsset("dark-mode");
+
+      if (darkThemeIconSource) {
+        darkThemeIcon.src = darkThemeIconSource;
+      }
     }
+  };
+
+  const cancelPendingNavigationScroll = () => {
+    if (!pendingNavigationFrame) {
+      return;
+    }
+
+    window.cancelAnimationFrame(pendingNavigationFrame);
+    pendingNavigationFrame = 0;
+  };
+
+  const cancelProgrammaticNavigation = () => {
+    cancelPendingNavigationScroll();
+    cancelNavigationScrollAnimation();
+  };
+
+  const scheduleNavigationScroll = (callback) => {
+    cancelProgrammaticNavigation();
+    pendingNavigationFrame = window.requestAnimationFrame(() => {
+      pendingNavigationFrame = 0;
+      callback();
+    });
   };
 
   const getThemeSourceKey = (theme) => (theme === "light" ? "themeSrcLight" : "themeSrcDark");
@@ -376,8 +463,16 @@
     const sourceKey = getThemeSourceKey(nextTheme);
 
     themeAwareSources.forEach((element) => {
-      const nextSource = element.dataset[sourceKey];
+      const nextSource = resolveThemeAsset(element.dataset[sourceKey]);
       const sourceAttribute = element.tagName === "LINK" ? "href" : "src";
+      const srcsetKey = nextTheme === "light" ? "themeSrcsetLight" : "themeSrcsetDark";
+      const nextSrcset = element.dataset[srcsetKey]
+        ? resolveThemeAsset(element.dataset[srcsetKey])
+        : null;
+
+      if (nextSrcset && element.getAttribute("srcset") !== nextSrcset) {
+        element.setAttribute("srcset", nextSrcset);
+      }
 
       if (!nextSource || element.getAttribute(sourceAttribute) === nextSource) {
         return;
@@ -402,10 +497,12 @@
       const stateName = menuIsOpen ? "Close" : "Hamburger";
       const themeName = theme === "light" ? "Light" : "Dark";
       const sourceKey = `menuIcon${stateName}${themeName}`;
-      const fallbackSource = `assets/icons/${iconName}${theme === "dark" ? "-dark" : ""}.svg`;
-      const nextSource = menuToggleIcon.dataset[sourceKey] || fallbackSource;
+      const fallbackAssetKey = `${iconName}-${theme}`;
+      const nextSource = resolveThemeAsset(
+        menuToggleIcon.dataset[sourceKey] || fallbackAssetKey
+      );
 
-      if (menuToggleIcon.getAttribute("src") !== nextSource) {
+      if (nextSource && menuToggleIcon.getAttribute("src") !== nextSource) {
         menuToggleIcon.setAttribute("src", nextSource);
       }
     }
@@ -452,32 +549,45 @@
     }
   };
 
+  const setThemeWithTransition = (theme, shouldPersist) => {
+    if (shouldReduceMotion()) {
+      setTheme(theme, shouldPersist);
+      return;
+    }
+
+    window.clearTimeout(themeTransitionTimer);
+    root.classList.remove("theme-transition", "theme-transition-fallback");
+
+    if (typeof document.startViewTransition === "function") {
+      root.classList.add("theme-transition");
+      const transition = document.startViewTransition(() => {
+        setTheme(theme, shouldPersist);
+      });
+
+      transition.finished
+        .then(() => {
+          root.classList.remove("theme-transition");
+        })
+        .catch(() => {
+          root.classList.remove("theme-transition");
+        });
+      return;
+    }
+
+    root.classList.add("theme-transition-fallback");
+    setTheme(theme, shouldPersist);
+    themeTransitionTimer = window.setTimeout(() => {
+      root.classList.remove("theme-transition-fallback");
+      themeTransitionTimer = 0;
+    }, THEME_TRANSITION_DURATION);
+  };
+
   const lockBodyScroll = () => {
     savedScrollY = getScrollY();
-    const scrollbarGap = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
-
-    body.style.position = "fixed";
-    body.style.top = `-${savedScrollY}px`;
-    body.style.left = "0";
-    body.style.right = "0";
-    body.style.width = "100%";
-    body.style.overflowY = "scroll";
-
-    if (scrollbarGap > 0) {
-      body.style.paddingRight = `${scrollbarGap}px`;
-    }
   };
 
   const unlockBodyScroll = () => {
     const restoreY = savedScrollY;
-
-    body.style.position = "";
-    body.style.top = "";
-    body.style.left = "";
-    body.style.right = "";
-    body.style.width = "";
-    body.style.overflowY = "";
-    body.style.paddingRight = "";
 
     withInstantScroll(() => {
       window.scrollTo({ top: restoreY, left: 0, behavior: "auto" });
@@ -486,35 +596,92 @@
     savedScrollY = 0;
   };
 
+  const getMenuFocusableElements = () => {
+    if (!sideMenu) {
+      return [];
+    }
+
+    return Array.from(
+      sideMenu.querySelectorAll(
+        "a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])"
+      )
+    ).filter(
+      (element) =>
+        element &&
+        !element.hasAttribute("inert") &&
+        element.getClientRects().length > 0
+    );
+  };
+
+  const setBackgroundInert = (isInert) => {
+    Array.from(body.children).forEach((element) => {
+      if (element === sideMenu || element === overlay || element.tagName === "SCRIPT") {
+        return;
+      }
+
+      element.toggleAttribute("inert", isInert);
+    });
+  };
+
+  const preventBackgroundScroll = (event) => {
+    if (!menuIsOpen || (event.target instanceof Element && sideMenu?.contains(event.target))) {
+      return;
+    }
+
+    event.preventDefault();
+  };
+
+  const addMenuScrollLockListeners = () => {
+    document.addEventListener("wheel", preventBackgroundScroll, { passive: false });
+    document.addEventListener("touchmove", preventBackgroundScroll, { passive: false });
+  };
+
+  const removeMenuScrollLockListeners = () => {
+    document.removeEventListener("wheel", preventBackgroundScroll);
+    document.removeEventListener("touchmove", preventBackgroundScroll);
+  };
+
   const openMenu = () => {
     if (!menuToggle || !sideMenu || menuIsOpen) {
       return;
     }
 
     syncHeaderHeight();
+    updateActiveNav();
     lockBodyScroll();
+    menuOpener = menuToggle;
     menuIsOpen = true;
     body.classList.add("menu-open");
     syncMenuToggle();
+    setBackgroundInert(true);
+    addMenuScrollLockListeners();
     syncHeroSymbolAnimation();
+
+    const focusTarget = menuClose || getMenuFocusableElements()[0] || sideMenu;
+    focusTarget.focus({ preventScroll: true });
   };
 
   const closeMenu = (options = {}) => {
-    const { restoreFocus = false } = options;
+    const { restoreFocus = true } = options;
 
     if (!menuToggle || !sideMenu || !menuIsOpen) {
       return false;
     }
 
-    if (restoreFocus || sideMenu.contains(document.activeElement)) {
-      menuToggle.focus({ preventScroll: true });
-    }
-
     body.classList.remove("menu-open");
     menuIsOpen = false;
     syncMenuToggle();
+    setBackgroundInert(false);
+    removeMenuScrollLockListeners();
     syncHeroSymbolAnimation();
     unlockBodyScroll();
+
+    const focusTarget = menuOpener?.isConnected ? menuOpener : menuToggle;
+    menuOpener = null;
+
+    if (restoreFocus) {
+      focusTarget?.focus({ preventScroll: true });
+    }
 
     return true;
   };
@@ -526,17 +693,6 @@
     }
 
     panel.removeAttribute("inert");
-  };
-
-  const isNewsCardInteractiveTarget = (target, card) => {
-    if (!(target instanceof Element)) {
-      return false;
-    }
-
-    const interactive = target.closest(
-      "a, button, input, select, textarea, summary, label, [role='button'], [role='link'], [contenteditable='true']"
-    );
-    return Boolean(interactive && card.contains(interactive));
   };
 
   const setNewsCardState = (card, toggle, panel, isExpanded) => {
@@ -612,26 +768,6 @@
         toggleNewsCard(card, toggle, panel);
       });
 
-      card.addEventListener("click", (event) => {
-        if (isNewsCardInteractiveTarget(event.target, card)) {
-          return;
-        }
-
-        toggleNewsCard(card, toggle, panel);
-      });
-
-      card.addEventListener("keydown", (event) => {
-        if (event.target !== card) {
-          return;
-        }
-
-        if (event.key !== "Enter" && event.key !== " ") {
-          return;
-        }
-
-        event.preventDefault();
-        toggleNewsCard(card, toggle, panel);
-      });
     });
   };
 
@@ -640,7 +776,7 @@
 
     themeToggle?.addEventListener("click", () => {
       const nextTheme = root.dataset.theme === "light" ? "dark" : "light";
-      setTheme(nextTheme, true);
+      setThemeWithTransition(nextTheme, true);
       scheduleHeaderSync();
     });
   };
@@ -670,9 +806,70 @@
       closeMenu();
     });
 
+    menuClose?.addEventListener("click", () => {
+      closeMenu();
+    });
+
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && menuIsOpen) {
-        closeMenu({ restoreFocus: true });
+        closeMenu();
+        return;
+      }
+
+      if (event.key === "Tab" && menuIsOpen) {
+        const focusableElements = getMenuFocusableElements();
+
+        if (focusableElements.length === 0) {
+          event.preventDefault();
+          sideMenu?.focus({ preventScroll: true });
+          return;
+        }
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+        const activeElement = document.activeElement;
+
+        if (!focusableElements.includes(activeElement)) {
+          event.preventDefault();
+          (event.shiftKey ? lastElement : firstElement).focus({ preventScroll: true });
+          return;
+        }
+
+        if (event.shiftKey && activeElement === firstElement) {
+          event.preventDefault();
+          lastElement.focus({ preventScroll: true });
+          return;
+        }
+
+        if (!event.shiftKey && activeElement === lastElement) {
+          event.preventDefault();
+          firstElement.focus({ preventScroll: true });
+        }
+
+        return;
+      }
+
+      const targetIsInteractive =
+        event.target instanceof Element &&
+        Boolean(
+          event.target.closest(
+            "a, button, input, select, textarea, [contenteditable='true']"
+          )
+        );
+
+      if (
+        menuIsOpen &&
+        (event.key === "ArrowUp" ||
+          event.key === "ArrowDown" ||
+          event.key === "PageUp" ||
+          event.key === "PageDown" ||
+          event.key === "Home" ||
+          event.key === "End" ||
+          event.key === " ") &&
+        !targetIsInteractive &&
+        (!(event.target instanceof Element) || !event.target.closest(".side-menu__nav"))
+      ) {
+        event.preventDefault();
       }
     });
   };
@@ -706,7 +903,7 @@
 
         if (menuIsOpen) {
           closeMenu();
-          window.requestAnimationFrame(performScroll);
+          scheduleNavigationScroll(performScroll);
           return;
         }
 
@@ -714,29 +911,109 @@
       });
     });
 
-    window.addEventListener("hashchange", () => {
-      if (!window.location.hash) {
+    // Re-scrolling on `load` used to override a user's first wheel/touch input
+    // after slow assets finished loading. The head bootstrap suppresses only the
+    // browser's initial anchor jump; this restores the URL once and scrolls only
+    // if no manual input has happened. Back/Forward remains browser-managed after
+    // initialization.
+    const initialHash = window.__snakeInitialHash;
+
+    if (initialHash) {
+      history.replaceState(
+        history.state,
+        "",
+        `${window.location.pathname}${window.location.search}${initialHash}`
+      );
+      window.__snakeInitialHash = "";
+
+      if (!window.__snakeManualScroll) {
+        withInstantScroll(() => {
+          scrollToHash(initialHash, { behavior: "auto", historyMode: "none" });
+        });
+      }
+
+      scheduleActiveNavUpdate();
+    }
+
+    // CSS scroll-margin keeps native Back/Forward anchor positioning clear of
+    // the sticky header without scheduling another programmatic scroll.
+    window.addEventListener("wheel", cancelProgrammaticNavigation, { passive: true });
+    window.addEventListener("touchmove", cancelProgrammaticNavigation, { passive: true });
+    window.addEventListener("pointerdown", cancelProgrammaticNavigation, { passive: true });
+    window.addEventListener("keydown", (event) => {
+      if (
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown" ||
+        event.key === "PageUp" ||
+        event.key === "PageDown" ||
+        event.key === "Home" ||
+        event.key === "End" ||
+        event.key === " "
+      ) {
+        cancelProgrammaticNavigation();
+      }
+    });
+  };
+
+  const initPageTransitions = () => {
+    window.addEventListener("pageshow", () => {
+      window.clearTimeout(pageNavigationTimer);
+      pageNavigationTimer = 0;
+      body.classList.remove("page-is-leaving");
+    });
+
+    document.addEventListener("click", (event) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey ||
+        !(event.target instanceof Element)
+      ) {
         return;
       }
 
-      window.requestAnimationFrame(() => {
-        scrollToHash(window.location.hash, { behavior: "auto", historyMode: "none" });
-        scheduleActiveNavUpdate();
-      });
-    });
+      const link = event.target.closest("a[href]");
+      if (
+        !link ||
+        link.hasAttribute("download") ||
+        (link.target && link.target.toLowerCase() !== "_self")
+      ) {
+        return;
+      }
 
-    if (window.location.hash) {
-      window.addEventListener(
-        "load",
-        () => {
-          withInstantScroll(() => {
-            scrollToHash(window.location.hash, { behavior: "auto", historyMode: "replace" });
-          });
-          scheduleActiveNavUpdate();
-        },
-        { once: true }
-      );
-    }
+      const url = new URL(link.href, window.location.href);
+      const isSameDocument =
+        url.origin === window.location.origin &&
+        url.pathname === window.location.pathname &&
+        url.search === window.location.search;
+
+      if (url.origin !== window.location.origin || isSameDocument) {
+        return;
+      }
+
+      event.preventDefault();
+      cancelProgrammaticNavigation();
+
+      if (menuIsOpen) {
+        closeMenu();
+      }
+
+      const navigate = () => {
+        pageNavigationTimer = 0;
+        window.location.assign(url.href);
+      };
+
+      if (shouldReduceMotion()) {
+        navigate();
+        return;
+      }
+
+      body.classList.add("page-is-leaving");
+      pageNavigationTimer = window.setTimeout(navigate, PAGE_EXIT_DURATION);
+    });
   };
 
   const initScrollRestoration = () => {
@@ -749,10 +1026,6 @@
         closeMenu();
         return;
       }
-
-      withInstantScroll(() => {
-        window.scrollTo({ top: getScrollY(), left: 0, behavior: "auto" });
-      });
 
       scheduleHeaderSync();
     });
@@ -799,7 +1072,7 @@
 
       if (menuIsOpen) {
         closeMenu();
-        window.requestAnimationFrame(goToTop);
+        scheduleNavigationScroll(goToTop);
         return;
       }
 
@@ -825,6 +1098,7 @@
     initHeroSymbolAnimation();
     initNewsCards();
     initMenu();
+    initPageTransitions();
     initHashScrolling();
     initScrollRestoration();
     initBackToTop();

@@ -7,6 +7,24 @@
       name="description"
       content="Информационный сайт клана «Змеиное логово» проекта «Мафия онлайн»."
     />
+    <link rel="canonical" href="https://snakepit.ru/" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Змеиное логово" />
+    <meta property="og:title" content="Змеиное логово" />
+    <meta
+      property="og:description"
+      content="Информационный сайт клана «Змеиное логово» проекта «Мафия онлайн»."
+    />
+    <meta property="og:url" content="https://snakepit.ru/" />
+    <meta property="og:image" content="https://snakepit.ru/social-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Змеиное логово" />
+    <meta
+      name="twitter:description"
+      content="Информационный сайт клана «Змеиное логово» проекта «Мафия онлайн»."
+    />
+    <meta name="twitter:image" content="https://snakepit.ru/social-image.png" />
     <meta name="theme-color" content="#08131f" />
     <title>Змеиное логово</title>
     <link
@@ -14,28 +32,78 @@
       href="assets/icon-dark.svg"
       type="image/svg+xml"
       data-theme-favicon
-      data-theme-src-light="assets/icon.svg"
-      data-theme-src-dark="assets/icon-dark.svg"
+      data-theme-src-light="icon-light"
+      data-theme-src-dark="icon-dark"
     />
-    <script src="js/theme-init.js"></script>
+    <script>
+      (() => {
+        let theme = "dark";
+        try {
+          const savedTheme = localStorage.getItem("theme");
+          theme =
+            savedTheme === "light" || savedTheme === "dark"
+              ? savedTheme
+              : matchMedia("(prefers-color-scheme: light)").matches
+                ? "light"
+                : "dark";
+        } catch {
+          theme = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+        }
+        document.documentElement.dataset.theme = theme;
+        document.querySelector('meta[name="theme-color"]').content =
+          theme === "light" ? "#f6f8f3" : "#08131f";
+
+        const initialHash = location.hash;
+        window.__snakeInitialHash = initialHash;
+        window.__snakeManualScroll = false;
+
+        if (initialHash) {
+          history.replaceState(history.state, "", location.pathname + location.search);
+          const markManualScroll = () => {
+            window.__snakeManualScroll = true;
+          };
+          addEventListener("wheel", markManualScroll, { capture: true, passive: true });
+          addEventListener("touchstart", markManualScroll, { capture: true, passive: true });
+          addEventListener("pointerdown", markManualScroll, { capture: true, passive: true });
+          addEventListener(
+            "keydown",
+            (event) => {
+              if (
+                event.key === "ArrowUp" ||
+                event.key === "ArrowDown" ||
+                event.key === "PageUp" ||
+                event.key === "PageDown" ||
+                event.key === "Home" ||
+                event.key === "End" ||
+                event.key === " "
+              ) {
+                markManualScroll();
+              }
+            },
+            { capture: true }
+          );
+        }
+      })();
+    </script>
     <link rel="stylesheet" href="css/styles.css" />
-    <script src="js/main.js" defer></script>
+    <script type="module" src="js/main.js" defer></script>
   </head>
   <body>
     <header class="site-header">
       <div class="site-header__inner">
         <a class="site-logo" href="#top" aria-label="К началу страницы">
           <img
-            src="assets/icon-dark.svg"
-            data-theme-src-light="assets/icon.svg"
-            data-theme-src-dark="assets/icon-dark.svg"
+            data-theme-src-light="icon-light"
+            data-theme-src-dark="icon-dark"
+            width="128"
+            height="128"
             alt=""
           />
         </a>
 
         <nav class="site-nav" aria-label="Основная навигация">
           <div class="nav-inner">
-            <div class="nav-links" aria-label="Разделы главной страницы">
+            <div class="nav-links" role="group" aria-label="Разделы главной страницы">
               <a class="nav-link" href="#top" data-section-link="top">Главная</a>
               <a class="nav-link" href="#team" data-section-link="team">О нас</a>
               <a class="nav-link" href="#rules" data-section-link="rules">Устав</a>
@@ -53,12 +121,16 @@
                 <img
                   class="theme-toggle__icon theme-toggle__icon--light"
                   src="assets/icons/light-mode.svg"
+                  width="512"
+                  height="512"
                   alt=""
                   aria-hidden="true"
                 />
                 <img
                   class="theme-toggle__icon theme-toggle__icon--dark"
                   src="assets/icons/dark-mode.svg"
+                  width="512"
+                  height="512"
                   alt=""
                   aria-hidden="true"
                 />
@@ -74,10 +146,12 @@
                 <img
                   class="menu-toggle__icon"
                   src="assets/icons/hamburger-dark.svg"
-                  data-menu-icon-hamburger-light="assets/icons/hamburger.svg"
-                  data-menu-icon-hamburger-dark="assets/icons/hamburger-dark.svg"
-                  data-menu-icon-close-light="assets/icons/close.svg"
-                  data-menu-icon-close-dark="assets/icons/close-dark.svg"
+                  data-menu-icon-hamburger-light="hamburger-light"
+                  data-menu-icon-hamburger-dark="hamburger-dark"
+                  data-menu-icon-close-light="close-light"
+                  data-menu-icon-close-dark="close-dark"
+                  width="512"
+                  height="512"
                   alt=""
                   aria-hidden="true"
                 />
@@ -89,12 +163,37 @@
     </header>
 
     <div class="menu-overlay" data-menu-overlay></div>
-    <aside class="side-menu" id="sideMenu" aria-hidden="true" aria-label="Боковое меню" inert>
+    <aside
+      class="side-menu"
+      id="sideMenu"
+      aria-hidden="true"
+      aria-label="Боковое меню"
+      tabindex="-1"
+      inert
+    >
+      <button
+        class="side-menu__close"
+        type="button"
+        data-menu-close
+        aria-label="Закрыть боковое меню"
+        title="Закрыть боковое меню"
+      >
+        <img
+          class="side-menu__close-icon"
+          src="assets/icons/close-dark.svg"
+          data-theme-src-light="close-light"
+          data-theme-src-dark="close-dark"
+          width="512"
+          height="512"
+          alt=""
+          aria-hidden="true"
+        />
+      </button>
       <nav class="side-menu__nav" aria-label="Навигация бокового меню">
-        <a class="side-menu__link" href="#top">Главная</a>
-        <a class="side-menu__link" href="#team">О нас</a>
-        <a class="side-menu__link" href="#rules">Устав</a>
-        <a class="side-menu__link" href="#contacts">Контакты</a>
+        <a class="side-menu__link" href="#top" data-section-link="top">Главная</a>
+        <a class="side-menu__link" href="#team" data-section-link="team">О нас</a>
+        <a class="side-menu__link" href="#rules" data-section-link="rules">Устав</a>
+        <a class="side-menu__link" href="#contacts" data-section-link="contacts">Контакты</a>
         <a class="side-menu__link" href="disclaimer.html">Отказ от ответственности</a>
         <a class="side-menu__link" href="news.html">Новости</a>
         <a class="side-menu__link" href="developments.html">Наши разработки</a>
@@ -120,23 +219,30 @@
           <div class="hero-media">
             <img
               class="hero-logo"
-              src="assets/logo-transparent-dark.png"
-              data-theme-src-light="assets/logo-transparent.png"
-              data-theme-src-dark="assets/logo-transparent-dark.png"
+              data-theme-src-light="logo-light"
+              data-theme-src-dark="logo-dark"
+              data-theme-srcset-light="logo-light-srcset"
+              data-theme-srcset-dark="logo-dark-srcset"
+              sizes="(max-width: 520px) min(310px, 88vw), (max-width: 560px) 35vw, (max-width: 980px) 33vw, 34vw"
+              width="920"
+              height="309"
+              decoding="async"
+              fetchpriority="high"
               alt="Змеиное логово"
             />
             <div class="hero-symbol" aria-hidden="true">
               <img
-                src="assets/icon-dark.svg"
-                data-theme-src-light="assets/icon.svg"
-                data-theme-src-dark="assets/icon-dark.svg"
+                data-theme-src-light="icon-light"
+                data-theme-src-dark="icon-dark"
+                width="128"
+                height="128"
                 alt=""
               />
             </div>
           </div>
 
           <div class="hero-content">
-            <p class="hero-kicker">Информационный сайт</p>
+            <p class="hero-kicker">Сайт логова</p>
             <h1 id="hero-title">Привет!</h1>
             <p>
               Это клан
@@ -145,7 +251,7 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 >«Змеиное логово»</a
-              >. Мы - объединение активных игроков проекта
+              >. Мы — объединение активных игроков проекта
               <a href="https://www.mafiaonline.ru/" target="_blank" rel="noopener noreferrer"
                 >mafiaonline</a
               >, одного из самых известных порталов для игры в чатовую мафию.
@@ -195,9 +301,12 @@
                 <div class="leader-card__top">
                   <span class="avatar avatar--photo">
                     <img
-                      src="assets/chief-dark.png"
-                      data-theme-src-light="assets/chief.png"
-                      data-theme-src-dark="assets/chief-dark.png"
+                      data-theme-src-light="chief-light"
+                      data-theme-src-dark="chief-dark"
+                      width="128"
+                      height="128"
+                      loading="lazy"
+                      decoding="async"
                       alt="Аватар Тошича"
                     />
                   </span>
@@ -222,9 +331,12 @@
                 <div class="leader-card__top">
                   <span class="avatar avatar--photo">
                     <img
-                      src="assets/vice-chief-dark.png"
-                      data-theme-src-light="assets/vice-chief.png"
-                      data-theme-src-dark="assets/vice-chief-dark.png"
+                      data-theme-src-light="vice-chief-light"
+                      data-theme-src-dark="vice-chief-dark"
+                      width="128"
+                      height="128"
+                      loading="lazy"
+                      decoding="async"
                       alt="Аватар Missouri"
                     />
                   </span>
@@ -245,11 +357,11 @@
             <div class="members-grid">
               <a
                 class="member-card"
-                href="https://www.mafiaonline.ru/info/%D0%A1%D1%82%D1%8B%D0%B4%20%D0%98%D1%81%D0%BF%D0%B0%D0%BD%D1%81%D0%BA%D0%B8%D0%B9"
+                href="https://www.mafiaonline.ru/info/Morgan"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <span class="member-name">Стыд Испанский</span>
+                <span class="member-name">Morgan</span>
                 <span class="member-trait">Самый быстрый</span>
                 <span class="member-description">В принятии решений.</span>
               </a>
@@ -265,17 +377,6 @@
                 <span class="member-description"
                   >Оказался в лучшем клане, будучи обычным игроком.</span
                 >
-              </a>
-
-              <a
-                class="member-card"
-                href="https://www.mafiaonline.ru/info/Blue%20Shark"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span class="member-name">Blue Shark</span>
-                <span class="member-trait">Самая невероятная</span>
-                <span class="member-description">Притворяется синей акулой.</span>
               </a>
 
               <a
@@ -315,17 +416,6 @@
 
               <a
                 class="member-card"
-                href="https://www.mafiaonline.ru/info/Nirvana"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span class="member-name">Nirvana</span>
-                <span class="member-trait">Самая умиротворённая</span>
-                <span class="member-description">Не торопится и умеет ждать.</span>
-              </a>
-
-              <a
-                class="member-card"
                 href="https://www.mafiaonline.ru/info/Jurata"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -352,7 +442,7 @@
           </div>
 
           <div class="team-group">
-            <h3>Кандидаты на вступление</h3>
+            <h3>Кандидат на вступление</h3>
             <div class="candidate-grid">
               <a
                 class="member-card"
@@ -381,19 +471,19 @@
           <div class="charter-panel">
             <div class="charter-copy">
               <p>
-                В городе, оглушенном выстрелами и пустыми криками на дневных собраниях, мы - та
+                В городе, оглушенном выстрелами и пустыми криками на дневных собраниях, мы — та
                 самая тишина, что наступает за секунду до конца.
               </p>
-              <p>Наш значок - это борьба с предателями их собственным оружием.</p>
+              <p>Наш значок — это борьба с предателями их собственным оружием.</p>
 
               <ul>
                 <li>
-                  Нож - это наша воля. Когда-то их вонзили в наши спины, а теперь ими будут
+                  Нож — это наша воля. Когда-то их вонзили в наши спины, а теперь ими будут
                   повержены все враги, пока они спят, скрываются в бане и в паспортах на сумрачном
                   переулке.
                 </li>
                 <li>
-                  Змея - это наш дух, а также олицетворение всех ползающих и холоднокровных, которых
+                  Змея — это наш дух, а также олицетворение всех ползающих и холоднокровных, которых
                   так манит блестящий острый клинок, от которого они и погибнут.
                 </li>
               </ul>
@@ -428,24 +518,26 @@
       <section class="section contacts-section" id="contacts" aria-labelledby="contacts-title">
         <div class="container container--contacts">
           <div class="section-heading">
-            <p class="section-kicker">Связь</p>
+            <p class="section-kicker">Связь с логовым</p>
             <h2 id="contacts-title">Контакты</h2>
           </div>
 
-          <div class="contacts-grid" role="list">
-            <a
+          <ul class="contacts-grid">
+            <li>
+              <a
               class="contact-card"
-              role="listitem"
-              href="https://t.me/tut-logovo"
+              href="https://t.me/tut_logovo"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Наш канал"
             >
               <span class="contact-icon" aria-hidden="true">
                 <img
-                  src="assets/telegram-dark.svg"
-                  data-theme-src-light="assets/telegram.svg"
-                  data-theme-src-dark="assets/telegram-dark.svg"
+                  data-theme-src-light="telegram-light"
+                  data-theme-src-dark="telegram-dark"
+                  width="512"
+                  height="512"
+                  loading="lazy"
                   alt=""
                 />
               </span>
@@ -456,36 +548,40 @@
               <span class="contact-disclaimer"
                 >Доступ к Telegram может быть ограничен на территории России</span
               >
-            </a>
+              </a>
+            </li>
 
-            <a
+            <li>
+              <a
               class="contact-card"
-              role="listitem"
-              href="https://t.me/leron977"
+              href="https://t.me/advertal"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Вступление в клан: Telegram @leron977"
+              aria-label="Вступление в клан: Telegram @advertal"
             >
               <span class="contact-icon" aria-hidden="true">
                 <img
-                  src="assets/telegram-dark.svg"
-                  data-theme-src-light="assets/telegram.svg"
-                  data-theme-src-dark="assets/telegram-dark.svg"
+                  data-theme-src-light="telegram-light"
+                  data-theme-src-dark="telegram-dark"
+                  width="512"
+                  height="512"
+                  loading="lazy"
                   alt=""
                 />
               </span>
               <div class="contact-content">
                 <span class="contact-label">Вступление в клан</span>
-                <span class="contact-link">@leron977</span>
+                <span class="contact-link">@advertal</span>
               </div>
               <span class="contact-disclaimer"
                 >Доступ к Telegram может быть ограничен на территории России</span
               >
-            </a>
+              </a>
+            </li>
 
-            <a
+            <li>
+              <a
               class="contact-card"
-              role="listitem"
               href="https://t.me/yellowlemon239"
               target="_blank"
               rel="noopener noreferrer"
@@ -493,9 +589,11 @@
             >
               <span class="contact-icon" aria-hidden="true">
                 <img
-                  src="assets/telegram-dark.svg"
-                  data-theme-src-light="assets/telegram.svg"
-                  data-theme-src-dark="assets/telegram-dark.svg"
+                  data-theme-src-light="telegram-light"
+                  data-theme-src-dark="telegram-dark"
+                  width="512"
+                  height="512"
+                  loading="lazy"
                   alt=""
                 />
               </span>
@@ -506,11 +604,12 @@
               <span class="contact-disclaimer"
                 >Доступ к Telegram может быть ограничен на территории России</span
               >
-            </a>
+              </a>
+            </li>
 
-            <a
+            <li>
+              <a
               class="contact-card"
-              role="listitem"
               href="mailto:robertbitlev@outlook.com"
               target="_blank"
               rel="noopener noreferrer"
@@ -520,11 +619,17 @@
                 <img
                   class="contact-icon__theme contact-icon__theme--light"
                   src="assets/icons/email.svg"
+                  width="24"
+                  height="24"
+                  loading="lazy"
                   alt=""
                 />
                 <img
                   class="contact-icon__theme contact-icon__theme--dark"
                   src="assets/icons/email-dark.svg"
+                  width="24"
+                  height="24"
+                  loading="lazy"
                   alt=""
                 />
               </span>
@@ -532,8 +637,9 @@
                 <span class="contact-label">Контактный адрес электронной почты</span>
                 <span class="contact-link contact-link--email">robertbitlev@outlook.com</span>
               </div>
-            </a>
-          </div>
+              </a>
+            </li>
+          </ul>
         </div>
       </section>
     </main>

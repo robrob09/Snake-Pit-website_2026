@@ -1,11 +1,44 @@
+# Dependencies
 node_modules/
+
+# Build output
+dist/
+.vite/
+
+# Temporary/generated files
 tmp/
 gen/
+.cache/
 
-*.zip
-
+# Test and audit reports
 playwright-report/
 test-results/
+blob-report/
+reports/
+coverage/
+lighthouse-report.html
+*.report.html
 
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Archives
+*.zip
+
+# Editors
+.idea/
+.vscode/
+
+# OS files
 .DS_Store
 Thumbs.db
+Desktop.ini
+desktop.ini

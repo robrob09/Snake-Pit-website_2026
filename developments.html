@@ -4,6 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Раздел будущих разработок клана «Змеиное логово»." />
+    <link rel="canonical" href="https://snakepit.ru/developments.html" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Змеиное логово" />
+    <meta property="og:title" content="Наши разработки | Змеиное логово" />
+    <meta property="og:description" content="Раздел будущих разработок клана «Змеиное логово»." />
+    <meta property="og:url" content="https://snakepit.ru/developments.html" />
+    <meta property="og:image" content="https://snakepit.ru/social-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Наши разработки | Змеиное логово" />
+    <meta name="twitter:description" content="Раздел будущих разработок клана «Змеиное логово»." />
+    <meta name="twitter:image" content="https://snakepit.ru/social-image.png" />
     <meta name="theme-color" content="#08131f" />
     <title>Наши разработки | Змеиное логово</title>
     <link
@@ -11,28 +23,78 @@
       href="assets/icon-dark.svg"
       type="image/svg+xml"
       data-theme-favicon
-      data-theme-src-light="assets/icon.svg"
-      data-theme-src-dark="assets/icon-dark.svg"
+      data-theme-src-light="icon-light"
+      data-theme-src-dark="icon-dark"
     />
-    <script src="js/theme-init.js"></script>
+    <script>
+      (() => {
+        let theme = "dark";
+        try {
+          const savedTheme = localStorage.getItem("theme");
+          theme =
+            savedTheme === "light" || savedTheme === "dark"
+              ? savedTheme
+              : matchMedia("(prefers-color-scheme: light)").matches
+                ? "light"
+                : "dark";
+        } catch {
+          theme = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+        }
+        document.documentElement.dataset.theme = theme;
+        document.querySelector('meta[name="theme-color"]').content =
+          theme === "light" ? "#f6f8f3" : "#08131f";
+
+        const initialHash = location.hash;
+        window.__snakeInitialHash = initialHash;
+        window.__snakeManualScroll = false;
+
+        if (initialHash) {
+          history.replaceState(history.state, "", location.pathname + location.search);
+          const markManualScroll = () => {
+            window.__snakeManualScroll = true;
+          };
+          addEventListener("wheel", markManualScroll, { capture: true, passive: true });
+          addEventListener("touchstart", markManualScroll, { capture: true, passive: true });
+          addEventListener("pointerdown", markManualScroll, { capture: true, passive: true });
+          addEventListener(
+            "keydown",
+            (event) => {
+              if (
+                event.key === "ArrowUp" ||
+                event.key === "ArrowDown" ||
+                event.key === "PageUp" ||
+                event.key === "PageDown" ||
+                event.key === "Home" ||
+                event.key === "End" ||
+                event.key === " "
+              ) {
+                markManualScroll();
+              }
+            },
+            { capture: true }
+          );
+        }
+      })();
+    </script>
     <link rel="stylesheet" href="css/styles.css" />
-    <script src="js/main.js" defer></script>
+    <script type="module" src="js/main.js"></script>
   </head>
   <body class="inner-page">
     <header class="site-header">
       <div class="site-header__inner">
         <a class="site-logo" href="index.html#top" aria-label="На главную страницу">
           <img
-            src="assets/icon-dark.svg"
-            data-theme-src-light="assets/icon.svg"
-            data-theme-src-dark="assets/icon-dark.svg"
+            data-theme-src-light="icon-light"
+            data-theme-src-dark="icon-dark"
+            width="128"
+            height="128"
             alt=""
           />
         </a>
 
         <nav class="site-nav" aria-label="Основная навигация">
           <div class="nav-inner">
-            <div class="nav-links" aria-label="Разделы главной страницы">
+            <div class="nav-links" role="group" aria-label="Разделы главной страницы">
               <a class="nav-link" href="index.html#top" data-section-link="top">Главная</a>
               <a class="nav-link" href="index.html#team" data-section-link="team">О нас</a>
               <a class="nav-link" href="index.html#rules" data-section-link="rules">Устав</a>
@@ -52,12 +114,16 @@
                 <img
                   class="theme-toggle__icon theme-toggle__icon--light"
                   src="assets/icons/light-mode.svg"
+                  width="512"
+                  height="512"
                   alt=""
                   aria-hidden="true"
                 />
                 <img
                   class="theme-toggle__icon theme-toggle__icon--dark"
                   src="assets/icons/dark-mode.svg"
+                  width="512"
+                  height="512"
                   alt=""
                   aria-hidden="true"
                 />
@@ -73,10 +139,12 @@
                 <img
                   class="menu-toggle__icon"
                   src="assets/icons/hamburger-dark.svg"
-                  data-menu-icon-hamburger-light="assets/icons/hamburger.svg"
-                  data-menu-icon-hamburger-dark="assets/icons/hamburger-dark.svg"
-                  data-menu-icon-close-light="assets/icons/close.svg"
-                  data-menu-icon-close-dark="assets/icons/close-dark.svg"
+                  data-menu-icon-hamburger-light="hamburger-light"
+                  data-menu-icon-hamburger-dark="hamburger-dark"
+                  data-menu-icon-close-light="close-light"
+                  data-menu-icon-close-dark="close-dark"
+                  width="512"
+                  height="512"
                   alt=""
                   aria-hidden="true"
                 />
@@ -88,7 +156,32 @@
     </header>
 
     <div class="menu-overlay" data-menu-overlay></div>
-    <aside class="side-menu" id="sideMenu" aria-hidden="true" aria-label="Боковое меню" inert>
+    <aside
+      class="side-menu"
+      id="sideMenu"
+      aria-hidden="true"
+      aria-label="Боковое меню"
+      tabindex="-1"
+      inert
+    >
+      <button
+        class="side-menu__close"
+        type="button"
+        data-menu-close
+        aria-label="Закрыть боковое меню"
+        title="Закрыть боковое меню"
+      >
+        <img
+          class="side-menu__close-icon"
+          src="assets/icons/close-dark.svg"
+          data-theme-src-light="close-light"
+          data-theme-src-dark="close-dark"
+          width="512"
+          height="512"
+          alt=""
+          aria-hidden="true"
+        />
+      </button>
       <nav class="side-menu__nav" aria-label="Навигация бокового меню">
         <a class="side-menu__link" href="index.html#top">Главная</a>
         <a class="side-menu__link" href="index.html#team">О нас</a>
@@ -96,7 +189,9 @@
         <a class="side-menu__link" href="index.html#contacts">Контакты</a>
         <a class="side-menu__link" href="disclaimer.html">Отказ от ответственности</a>
         <a class="side-menu__link" href="news.html">Новости</a>
-        <a class="side-menu__link" href="developments.html">Наши разработки</a>
+        <a class="side-menu__link is-active" href="developments.html" aria-current="page"
+          >Наши разработки</a
+        >
       </nav>
       <div class="side-menu__footer" aria-label="Информация о клане">
         <p class="side-menu__footer-line">Клан «Змеиное логово»</p>

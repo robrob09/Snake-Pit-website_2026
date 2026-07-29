@@ -1,0 +1,28 @@
+{
+  "name": "snake-pit-website_2026",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "Сайт клана «Змеиное логово» проекта «Мафия онлайн».",
+  "scripts": {
+    "serve": "vite --host 127.0.0.1 --port 4173 --strictPort",
+    "dev": "npm run serve",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4174 --strictPort",
+    "test:e2e": "npm run build && playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "lighthouse:chrome": "chrome-debug --port=9222 --headless=new",
+    "lighthouse": "npm run lighthouse:mobile && npm run lighthouse:desktop",
+    "lighthouse:mobile": "lighthouse http://127.0.0.1:4174 --port=9222 --output=html --output-path=./reports/lighthouse-mobile.html --quiet",
+    "lighthouse:desktop": "lighthouse http://127.0.0.1:4174 --port=9222 --preset=desktop --output=html --output-path=./reports/lighthouse-desktop.html --quiet"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
+    "@playwright/test": "^1.62.0",
+    "lighthouse": "^13.4.1",
+    "vite": "^8.1.5"
+  }
+}
