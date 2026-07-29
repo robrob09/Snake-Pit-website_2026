@@ -38,6 +38,7 @@
   --button-text: #05100d;
   --shadow: 0 22px 60px rgba(0, 0, 0, 0.34);
   --header-bg: rgba(5, 12, 22, 0.84);
+  --menu-bg: #050c16;
   --page-overlay: rgba(0, 0, 0, 0.46);
   --radius: 8px;
   --header-min-height: 72px;
@@ -69,6 +70,7 @@ html[data-theme="light"] {
   --button-text: #f7fbf8;
   --shadow: 0 18px 44px rgba(36, 61, 70, 0.14);
   --header-bg: rgba(246, 248, 243, 0.88);
+  --menu-bg: #ffffff;
   --page-overlay: rgba(10, 23, 29, 0.22);
   --theme-color: #f6f8f3;
   --icon-scroll-up: url("../assets/icons/scroll-up.svg");
@@ -378,9 +380,7 @@ html[data-theme="light"] .theme-toggle__icon--light {
   overscroll-behavior: contain;
   border-top: 1px solid var(--border);
   border-left: 1px solid var(--border);
-  background: var(--header-bg);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: var(--menu-bg);
   box-shadow: -28px 0 70px rgba(0, 0, 0, 0.34);
   transform: translateX(105%);
   transition: transform 460ms cubic-bezier(0.4, 0, 0.2, 1);

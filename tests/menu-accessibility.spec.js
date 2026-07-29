@@ -47,6 +47,7 @@ test("drawer keeps one stationary toggle and traps focus across the menu on ever
     const { toggle, toggleBox: initialToggleBox } = await openMenu(page);
     const drawer = page.locator(".side-menu");
     const close = page.locator(".menu-toggle");
+    const themeToggle = page.locator(".theme-toggle");
     const focusableElements = drawer.locator(
       "a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])"
     );
@@ -54,10 +55,11 @@ test("drawer keeps one stationary toggle and traps focus across the menu on ever
     await expect(close).toBeFocused();
     expect(await toggle.boundingBox()).toEqual(initialToggleBox);
     await expect(page.locator(".site-header")).not.toHaveAttribute("inert", "");
+    await expect(themeToggle).not.toHaveAttribute("inert", "");
     await expect
       .poll(() =>
         page
-          .locator(".site-header a, .theme-toggle")
+          .locator(".site-header a")
           .evaluateAll((elements) => elements.every((element) => element.hasAttribute("inert")))
       )
       .toBe(true);
@@ -68,10 +70,38 @@ test("drawer keeps one stationary toggle and traps focus across the menu on ever
       await expect(backToTop).toHaveAttribute("inert", "");
     }
     await expect(drawer).not.toHaveAttribute("inert", "");
+    await expect(drawer).toHaveCSS(
+      "background-color",
+      (await page.locator("html").getAttribute("data-theme")) === "light"
+        ? "rgb(255, 255, 255)"
+        : "rgb(5, 12, 22)"
+    );
+
+    const themeBefore = await page.locator("html").getAttribute("data-theme");
+    await themeToggle.click();
+    await expect
+      .poll(() => page.locator("html").getAttribute("data-theme"))
+      .not.toBe(themeBefore);
+    await expect(page.locator("html")).not.toHaveClass(
+      /theme-transition|theme-transition-fallback/
+    );
+    await expect(drawer).toHaveCSS(
+      "background-color",
+      themeBefore === "light" ? "rgb(5, 12, 22)" : "rgb(255, 255, 255)"
+    );
+    await expect(drawer).toHaveAttribute("aria-hidden", "false");
+    await expect(
+      page.getByRole("button", { name: "Закрыть боковое меню", exact: true })
+    ).toHaveCount(1);
+    await expect(drawer.locator("button")).toHaveCount(0);
 
     await focusableElements.last().focus();
     await page.keyboard.press("Tab");
+    await expect(themeToggle).toBeFocused();
+    await page.keyboard.press("Tab");
     await expect(close).toBeFocused();
+    await page.keyboard.press("Shift+Tab");
+    await expect(themeToggle).toBeFocused();
     await page.keyboard.press("Shift+Tab");
     await expect(focusableElements.last()).toBeFocused();
 

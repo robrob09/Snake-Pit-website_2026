@@ -611,7 +611,14 @@ import { resolveThemeAsset } from "./theme-assets.js";
         element.getClientRects().length > 0
     );
 
-    return menuToggle ? [menuToggle, ...drawerElements] : drawerElements;
+    const headerElements = [themeToggle, menuToggle].filter(
+      (element) =>
+        element &&
+        !element.hasAttribute("inert") &&
+        element.getClientRects().length > 0
+    );
+
+    return [...headerElements, ...drawerElements];
   };
 
   const setBackgroundInert = (isInert) => {
@@ -623,9 +630,12 @@ import { resolveThemeAsset } from "./theme-assets.js";
       if (element === siteHeader && menuToggle) {
         element
           .querySelectorAll(
-            "a[href], button:not(.menu-toggle), input, select, textarea, [tabindex]:not(.menu-toggle)"
+            "a[href], button, input, select, textarea, [tabindex]"
           )
-          .forEach((control) => control.toggleAttribute("inert", isInert));
+          .forEach((control) => {
+            const staysInteractive = control === menuToggle || control === themeToggle;
+            control.toggleAttribute("inert", isInert && !staysInteractive);
+          });
         return;
       }
 
