@@ -7,11 +7,13 @@ const openMenu = async (page) => {
   const toggleBox = await toggle.boundingBox();
   await toggle.click();
   await expect(page.locator(".side-menu")).toHaveAttribute("aria-hidden", "false");
+  await expect(page.getByRole("button", { name: "Закрыть боковое меню", exact: true })).toHaveCount(1);
+  await expect(page.locator(".side-menu button")).toHaveCount(0);
   return { toggle, toggleBox };
 };
 
 const closeMenu = async (page) => {
-  await page.locator(".side-menu").getByRole("button", { name: "Закрыть боковое меню" }).click();
+  await page.locator(".menu-toggle").click();
   await expect(page.locator(".side-menu")).toHaveAttribute("aria-hidden", "true");
 };
 
@@ -32,7 +34,7 @@ const expectBackgroundAvailable = async (page) => {
   }
 };
 
-test("drawer moves initial focus inside the menu and keeps it trapped on every page", async ({ page }) => {
+test("drawer keeps one stationary toggle and traps focus across the menu on every page", async ({ page }) => {
   const pages = [
     { path: "/index.html", link: '#team', url: /index\.html#team$/ },
     { path: "/news.html", link: "index.html#team", url: /index\.html#team$/ },
@@ -44,21 +46,21 @@ test("drawer moves initial focus inside the menu and keeps it trapped on every p
     await page.goto(currentPage.path, { waitUntil: "load" });
     const { toggle, toggleBox: initialToggleBox } = await openMenu(page);
     const drawer = page.locator(".side-menu");
-    const close = drawer.getByRole("button", { name: "Закрыть боковое меню", exact: true });
+    const close = page.locator(".menu-toggle");
     const focusableElements = drawer.locator(
       "a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])"
     );
 
     await expect(close).toBeFocused();
-    await expect(toggle).not.toBeFocused();
-    expect(
-      await page.evaluate(() => {
-        const drawerElement = document.querySelector(".side-menu");
-        return drawerElement?.contains(document.activeElement) || false;
-      })
-    ).toBe(true);
     expect(await toggle.boundingBox()).toEqual(initialToggleBox);
-    await expect(page.locator(".site-header")).toHaveAttribute("inert", "");
+    await expect(page.locator(".site-header")).not.toHaveAttribute("inert", "");
+    await expect
+      .poll(() =>
+        page
+          .locator(".site-header a, .theme-toggle")
+          .evaluateAll((elements) => elements.every((element) => element.hasAttribute("inert")))
+      )
+      .toBe(true);
     await expect(page.locator("main")).toHaveAttribute("inert", "");
     await expect(page.locator(".site-footer")).toHaveAttribute("inert", "");
     const backToTop = page.locator(".back-to-top");

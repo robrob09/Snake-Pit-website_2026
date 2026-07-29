@@ -11,7 +11,6 @@ import { resolveThemeAsset } from "./theme-assets.js";
   const menuToggleIcon = menuToggle?.querySelector(".menu-toggle__icon");
   const heroSymbol = document.querySelector(".hero-symbol");
   const sideMenu = document.querySelector(".side-menu");
-  const menuClose = sideMenu?.querySelector("[data-menu-close]");
   const overlay = document.querySelector("[data-menu-overlay]");
   const backToTop = document.querySelector(".back-to-top");
   const newsCards = Array.from(document.querySelectorAll("[data-news-card]"));
@@ -601,7 +600,7 @@ import { resolveThemeAsset } from "./theme-assets.js";
       return [];
     }
 
-    return Array.from(
+    const drawerElements = Array.from(
       sideMenu.querySelectorAll(
         "a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])"
       )
@@ -611,11 +610,22 @@ import { resolveThemeAsset } from "./theme-assets.js";
         !element.hasAttribute("inert") &&
         element.getClientRects().length > 0
     );
+
+    return menuToggle ? [menuToggle, ...drawerElements] : drawerElements;
   };
 
   const setBackgroundInert = (isInert) => {
     Array.from(body.children).forEach((element) => {
       if (element === sideMenu || element === overlay || element.tagName === "SCRIPT") {
+        return;
+      }
+
+      if (element === siteHeader && menuToggle) {
+        element
+          .querySelectorAll(
+            "a[href], button:not(.menu-toggle), input, select, textarea, [tabindex]:not(.menu-toggle)"
+          )
+          .forEach((control) => control.toggleAttribute("inert", isInert));
         return;
       }
 
@@ -657,8 +667,7 @@ import { resolveThemeAsset } from "./theme-assets.js";
     addMenuScrollLockListeners();
     syncHeroSymbolAnimation();
 
-    const focusTarget = menuClose || getMenuFocusableElements()[0] || sideMenu;
-    focusTarget.focus({ preventScroll: true });
+    menuToggle.focus({ preventScroll: true });
   };
 
   const closeMenu = (options = {}) => {
@@ -803,10 +812,6 @@ import { resolveThemeAsset } from "./theme-assets.js";
     }
 
     overlay?.addEventListener("click", () => {
-      closeMenu();
-    });
-
-    menuClose?.addEventListener("click", () => {
       closeMenu();
     });
 

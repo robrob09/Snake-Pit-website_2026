@@ -101,7 +101,7 @@ const clickMenuToggle = async (page) => {
 };
 
 const closeMenu = async (page) => {
-  await page.locator(".side-menu").getByRole("button", { name: "Закрыть боковое меню" }).click();
+  await clickMenuToggle(page);
 };
 
 test("manual scrolling wins over slow-load hash positioning", async ({ page }) => {
