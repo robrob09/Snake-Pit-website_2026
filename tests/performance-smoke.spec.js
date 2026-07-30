@@ -361,6 +361,91 @@ test("images keep their proportions across every page and breakpoint", async ({ 
   expect(errors).toEqual([]);
 });
 
+test("mobile navigation is opaque and the hero symbol uses the available space", async ({
+  page,
+}) => {
+  const errors = collectPageErrors(page);
+
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await page.goto("/index.html", { waitUntil: "load" });
+
+  const tabletHero = await page.evaluate(() => {
+    const image = document.querySelector(".hero-symbol img");
+    image.style.animation = "none";
+
+    const area = document.querySelector(".hero-symbol").getBoundingClientRect();
+    const symbol = image.getBoundingClientRect();
+    const actions = document.querySelector(".hero-actions").getBoundingClientRect();
+
+    return {
+      areaBottomDelta: Math.abs(area.bottom - actions.bottom),
+      centerDelta: Math.abs(
+        (symbol.top + symbol.bottom) / 2 - (area.top + area.bottom) / 2
+      ),
+      symbolRatio: symbol.width / symbol.height,
+      symbolWidth: symbol.width,
+    };
+  });
+
+  expect(tabletHero.areaBottomDelta).toBeLessThan(1);
+  expect(tabletHero.centerDelta).toBeLessThan(1);
+  expect(Math.abs(tabletHero.symbolRatio - 1)).toBeLessThan(0.01);
+  expect(tabletHero.symbolWidth).toBeGreaterThan(280);
+
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.reload({ waitUntil: "load" });
+
+  const desktopHero = await page.evaluate(() => {
+    const image = document.querySelector(".hero-symbol img");
+    image.style.animation = "none";
+
+    const area = document.querySelector(".hero-symbol").getBoundingClientRect();
+    const symbol = image.getBoundingClientRect();
+    const actions = document.querySelector(".hero-actions").getBoundingClientRect();
+
+    return {
+      areaBottomDelta: Math.abs(area.bottom - actions.bottom),
+      symbolRatio: symbol.width / symbol.height,
+      symbolWidth: symbol.width,
+    };
+  });
+
+  expect(desktopHero.areaBottomDelta).toBeLessThan(1);
+  expect(Math.abs(desktopHero.symbolRatio - 1)).toBeLessThan(0.01);
+  expect(desktopHero.symbolWidth).toBeGreaterThan(300);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+
+  for (const theme of ["dark", "light"]) {
+    await page.goto("/index.html", { waitUntil: "load" });
+    await page.evaluate((nextTheme) => localStorage.setItem("theme", nextTheme), theme);
+    await page.reload({ waitUntil: "load" });
+
+    const phoneHero = await page.evaluate(() => {
+      const headerStyle = getComputedStyle(document.querySelector(".site-header"));
+      const logo = document.querySelector(".hero-logo").getBoundingClientRect();
+      const kicker = document.querySelector(".hero-kicker").getBoundingClientRect();
+      const symbolStyle = getComputedStyle(document.querySelector(".hero-symbol"));
+
+      return {
+        headerBackground: headerStyle.backgroundColor,
+        headerBackdrop: headerStyle.backdropFilter || headerStyle.webkitBackdropFilter,
+        logoAboveKicker: logo.bottom <= kicker.top,
+        symbolDisplay: symbolStyle.display,
+        overflowX: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      };
+    });
+
+    expect(phoneHero.headerBackground).toMatch(/^rgb\(\d+, \d+, \d+\)$/);
+    expect(phoneHero.headerBackdrop).toBe("none");
+    expect(phoneHero.logoAboveKicker).toBe(true);
+    expect(phoneHero.symbolDisplay).toBe("none");
+    expect(phoneHero.overflowX).toBeLessThanOrEqual(0);
+  }
+
+  expect(errors).toEqual([]);
+});
+
 test("menu state and navigation timing match the visible section", async ({ page }) => {
   const errors = collectPageErrors(page);
   await page.setViewportSize({ width: 1280, height: 720 });

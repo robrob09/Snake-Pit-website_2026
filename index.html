@@ -88,7 +88,7 @@
     <link rel="stylesheet" href="css/styles.css" />
     <script type="module" src="js/main.js" defer></script>
   </head>
-  <body>
+  <body class="home-page">
     <header class="site-header">
       <div class="site-header__inner">
         <a class="site-logo" href="#top" aria-label="К началу страницы">
@@ -205,7 +205,14 @@
               data-theme-src-dark="logo-dark"
               data-theme-srcset-light="logo-light-srcset"
               data-theme-srcset-dark="logo-dark-srcset"
-              sizes="(max-width: 520px) min(310px, 88vw), (max-width: 560px) 35vw, (max-width: 980px) 33vw, 34vw"
+              src="assets/responsive/logo-460/logo-transparent.webp"
+              srcset="
+                assets/responsive/logo-310/logo-transparent.webp 310w,
+                assets/responsive/logo-460/logo-transparent.webp 460w,
+                assets/responsive/logo-620/logo-transparent.webp 620w,
+                assets/responsive/logo-920/logo-transparent.webp 920w
+              "
+              sizes="(max-width: 460px) min(350px, 88vw), (max-width: 680px) min(460px, 88vw), (max-width: 980px) 33vw, 34vw"
               width="920"
               height="309"
               decoding="async"
